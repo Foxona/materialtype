@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
+
+</head>
+
+<body>
+    <script>
+
+        function test() {
+            function getRandomSymbol() {
+                const indexSymbol = Math.floor(Math.random() * symbols.length)
+                return symbols[indexSymbol]
+            }
+            function getRandomBoard() {
+                const newBoard = []
+                for (let i = 0; i < 3; i++) {
+                    newBoard.push([getRandomSymbol(), getRandomSymbol(), getRandomSymbol()])
+                }
+                return (newBoard)
+            }
+            const testArrays = []
+            for (let i = 0; i < 2; i++) {
+                testArrays.push(getRandomBoard())
+            }
+            // printBoard(testArrays[0])
+            // console.log(testArrays.length)
+            for (let tai = 0; tai < testArrays.length; tai++) {
+                printBoard(testArrays[tai], tai + 1)
+                console.log(`Победил: ` + isWinner(testArrays[tai]))
+            }
+        }
+
+        function isWinner(prop) {
+            for (let si = 0; si < symbols.length - 1; si++) {
+                const s = symbols[si]
+
+                for (let i = 0; i < prop.length; i++) {
+                    if (prop[0][i] === s && prop[1][i] === s && prop[2][i] === s) {
+                        return s
+                    }
+                }
+
+                for (let i = 0; i < prop.length; i++) {
+                    if (prop[i][0] === s && prop[i][1] === s && prop[i][2] === s) {
+                        return s
+                    }
+                }
+
+                if (prop[0][0] === s && prop[1][1] === s && prop[2][2] === s) {
+                    return s
+                }
+
+                if (prop[0][2] === s && prop[1][1] === s && prop[2][0] === s) {
+                    return s
+                }
+            }
+            return ("-")
+        }
+
+        function printBoard(arr, index) {
+            console.log(`Общее содержимое массива arr ${index}: ` + arr)
+            console.log(`Построковое содержимое массива arr ${index}:`)
+            for (let i = 0; i < arr.length; i++) {
+                console.log(arr[i])
+            }
+        }
+
+        function getEmptyBoard() {
+            return [
+                ["-", "-", "-"],
+                ["-", "-", "-"],
+                ["-", "-", "-"]
+            ]
+        }
+
+        const symbols = ["X", "O", "-"];
+        let gameBoard = getEmptyBoard()
+        console.log(gameBoard)
+
+        function win() {
+            turn(0, 1)
+            turn(1, 1)
+            turn(2, 1)
+        }
+
+        function turn(row, col) {
+            console.log(gameBoard)
+            if (gameBoard[row][col] !== "-") {
+                console.log('Невозможно ходить там где нельзя!')
+                return
+            }
+
+            if (isWinner(gameBoard) === "X" || isWinner(gameBoard) === "O") {
+                console.log('Игра окончена!')
+                console.log(`Уже победил: ` + isWinner(gameBoard))
+                return
+            }
+
+            if (col > 2 || row > 2) {
+                console.log('Неверно выбран выбор!')
+                return
+            }
+
+            gameBoard[row][col] = alt()
+            printBoard(gameBoard, 0)
+
+            if (isWinner(gameBoard) === "-") {
+                console.log('Игра продолжается!')
+            } else {
+                console.log(`Победитель: ` + isWinner(gameBoard))
+            }
+        }
+
+        let xTurn = true
+        function alt() {
+            const vrem = (xTurn ? 'X' : 'O')
+            xTurn = !xTurn
+            return vrem;
+        }
+        // test()
+
+    </script>
+</body>
+
+</html>>
