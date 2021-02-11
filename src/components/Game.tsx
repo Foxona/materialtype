@@ -3,18 +3,69 @@ import React from 'react';
 import { useState } from 'react'
 import styles from './Game.module.css'
 
-type GameProps = {board: string[][]}
+// type GameSymbol = "X" | "O" | "-"
+type GameProps = { 
+    board: string[][],
+    onClick: (x: number, y: number) => void,
+    message: string
+}
 
-function GameRender(props:GameProps) {
+function emptyBoard() {
+    return [
+        ["-", "-", "-"],
+        ["-", "-", "-"],
+        ["-", "-", "-"]
+    ]
+}
+
+
+function isWinner(board: string[][]) {
+    const symbols = ["X", "O", "-"];
+    for (let si = 0; si < symbols.length - 1; si++) {
+        const s = symbols[si]
+
+        for (let i = 0; i < board.length; i++) {
+            if (board[0][i] === s && board[1][i] === s && board[2][i] === s) {
+                return s
+            }
+        }
+
+        for (let i = 0; i < board.length; i++) {
+            if (board[i][0] === s && board[i][1] === s && board[i][2] === s) {
+                return s
+            }
+        }
+
+        if (board[0][0] === s && board[1][1] === s && board[2][2] === s) {
+            return s
+        }
+
+        if (board[0][2] === s && board[1][1] === s && board[2][0] === s) {
+            return s
+        }
+    }
+    return ("-")
+}
+
+
+
+function GameRender(props: GameProps) {
     const iBoard = props.board;
+    const parrentClick = props.onClick
+    const message = props.message
+
+    function handleClick(x: number, y: number) {
+        parrentClick(x, y)
+    }
 
     const renderBoard = [] // 3 ul
+
     for (let i = 0; i < iBoard.length; i++) {
         let currentRow = iBoard[i]
         const fillArr = [] // 3 li
         for (let v = 0; v < currentRow.length; v++) {
             const currentCell = currentRow[v]
-            fillArr.push(<li className={styles.li}>{(currentCell === '-') ? " " : currentCell}</li>)
+            fillArr.push(<li onClick={() => { handleClick(v, i) }} className={styles.li}>{(currentCell === '-') ? " " : currentCell}</li>)
         }
         renderBoard.push(<ul className={styles.ul}>{fillArr}</ul>)
     }
@@ -24,30 +75,53 @@ function GameRender(props:GameProps) {
             {/* {[(<div>1</div>), (<div>2</div>), (<div>3</div>)]} */}
             {renderBoard}
         </div>
+        <div>{message}</div>
     </>)
 }
 
 export default function Game() {
-    const iBoard2 = [
-        ["X", "X", "-", "O"],
-        ["X", "X", "X", "O"],
-        ["O", "X", "-", "X"],
-        ["X", "O", "-", "-"],
-    ]
-    const iBoard = [
-        ["X", "X", "-"],
-        ["X", "X", "X"],
-        ["O", "X", "-"]
-    ]
+    let [gameBoard, setBoard] = useState(emptyBoard())
+    let [curPlayer, setCurPlayer] = useState("X")
+    let [message, setMessage] = useState("")
 
-    return (<GameRender board={iBoard} />)
+    function turn(row: number, col: number) {
+        console.log(gameBoard)
+        if (gameBoard[row][col] !== "-") {
+            setMessage('Невозможно ходить там где нельзя!')
+            return
+        }
+
+        if (isWinner(gameBoard) === "X" || isWinner(gameBoard) === "O") {
+            setMessage(`Игра окончена! Уже победил: ` + isWinner(gameBoard))
+            return
+        }
+
+        if (col > 2 || row > 2) {
+            setMessage('Неверно выбран выбор!')
+            return
+        }
+
+        gameBoard[row][col] = curPlayer
+
+        if (isWinner(gameBoard) === "-") {
+            setMessage('Игра продолжается!')
+        } else {
+            setMessage(`Победитель: ` + isWinner(gameBoard))
+        }
+    }
+
+
+    const handleClick = function (col: number, row: number) {
+        console.log(col + " " + row)
+        turn(row, col)
+        setBoard([...gameBoard])
+        if (curPlayer === "O") {
+            setCurPlayer("X")
+        } else {
+            setCurPlayer("O")
+        }
+    }
+
+    return (<GameRender board={gameBoard} onClick={handleClick} message={message}/>)
 }
 
-    // for (let v = 0; v < 3; v++) {
-    //     ulElems.push((<ul style={{ display: "flex" }}><li>{v}</li></ul>))
-    //     console.log(ulElems)
-
-    //     for (let i = 0; i < 3; i++) {
-    //         ulElems.push((<li style={{ listStyle: "none" }}>X</li>))
-    //     }
-    // }
