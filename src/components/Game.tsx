@@ -2,6 +2,7 @@
 import React from 'react';
 import { useState } from 'react'
 import styles from './Game.module.css'
+import { winComboDiag, testBoard } from './diag'
 
 // type GameSymbol = "X" | "O" | "-"
 type GameProps = {
@@ -18,33 +19,32 @@ function emptyBoard() {
     ]
 }
 
+const newBoard = [
+    ["-", "-", "-", "X"],
+    ["-", "-", "X", "-"],
+    ["-", "X", "-", "-"],
+    ["-", "-", "-", "-"]
+]
+
+
 function isWinner(board: string[][]) {
     const symbols = ["X", "O", "-"];
 
+    const winLength = 3
+
     for (let si = 0; si < symbols.length - 1; si++) {
         const s = symbols[si]
-
-        for (let i = 0; i < board.length; i++) {
-            if (board[0][i] === s && board[1][i] === s && board[2][i] === s) {
-                return s
-            }
+        const winRow = (e: string, index: number, arr: string[]) => {
+            if (arr.length < index + winLength) { return false }
+            return arr.slice(index, index + winLength).every(v => v === s)
         }
-
-        for (let i = 0; i < board.length; i++) {
-            if (board[i][0] === s && board[i][1] === s && board[i][2] === s) {
-                return s
-            }
+        const winCol = (e: string[], index: number, board: string[][]) => {
+            return board.map(row => row[index]).some(winRow)
         }
-
-        if (board[0][0] === s && board[1][1] === s && board[2][2] === s) {
-            return s
-        }
-
-        if (board[0][2] === s && board[1][1] === s && board[2][0] === s) {
+        if (board.some((row) => row.some(winRow)) || board.some(winCol) || winComboDiag(board, winLength, s)) {
             return s
         }
     }
-
     return ("-")
 }
 
@@ -69,8 +69,7 @@ function GameRender(props: GameProps) {
     //     renderBoard.push(<ul className={styles.ul}>{fillArr}</ul>)
     // }
 
-    const renderBoard = iBoard.map((i, col) => {
-        let currentRow = i
+    const renderBoard = iBoard.map((currentRow, col) => {
         const fillArr = currentRow.map((v, row) => (<li key={row} onClick={() => { handleClick(row, col) }} className={styles.li}>{(v === '-') ? " " : v}</li>))
         return (<ul key={col} className={styles.ul}>{fillArr}</ul>)
     })
@@ -129,14 +128,6 @@ export default function Game() {
         const testArr = ["X", "X", "O", " ", "X", "O", "O", "O", "X"]
         const winLength = 4
 
-        function wincombo2(e: string, index: number, arr: string[]) {
-            return arr.slice(index, index + winLength).every(v => v === "O")
-        }
-
-        function wincomboCol2(e: string, index: number, board: string[][]) {
-            return board.map(row => row[index]).slice(index, index + winLength).every(v => v === "O")
-        }
-
         function winCombination(e: string, index: number, arr: string[]) {
             let sum = 0
             for (let i = 0; i < winLength; i++) {
@@ -150,7 +141,9 @@ export default function Game() {
             }
             return false
         }
-        console.log(testArr.some(wincombo2))
+        // console.log(testArr.some(wincombo2))
+        // console.log(winComboDiag(testBoard, 4, "O"))
+
     }
     return (<GameRender board={gameBoard} onClick={handleClick} message={message} />)
 }
