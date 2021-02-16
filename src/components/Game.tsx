@@ -4,7 +4,7 @@ import { useState } from 'react'
 import styles from './Game.module.css'
 
 // type GameSymbol = "X" | "O" | "-"
-type GameProps = { 
+type GameProps = {
     board: string[][],
     onClick: (x: number, y: number) => void,
     message: string
@@ -18,9 +18,9 @@ function emptyBoard() {
     ]
 }
 
-
 function isWinner(board: string[][]) {
     const symbols = ["X", "O", "-"];
+
     for (let si = 0; si < symbols.length - 1; si++) {
         const s = symbols[si]
 
@@ -44,10 +44,9 @@ function isWinner(board: string[][]) {
             return s
         }
     }
+
     return ("-")
 }
-
-
 
 function GameRender(props: GameProps) {
     const iBoard = props.board;
@@ -58,17 +57,23 @@ function GameRender(props: GameProps) {
         parrentClick(x, y)
     }
 
-    const renderBoard = [] // 3 ul
+    // const renderBoard: JSX.Element[] = [] // 3 ul
 
-    for (let i = 0; i < iBoard.length; i++) {
-        let currentRow = iBoard[i]
-        const fillArr = [] // 3 li
-        for (let v = 0; v < currentRow.length; v++) {
-            const currentCell = currentRow[v]
-            fillArr.push(<li onClick={() => { handleClick(v, i) }} className={styles.li}>{(currentCell === '-') ? " " : currentCell}</li>)
-        }
-        renderBoard.push(<ul className={styles.ul}>{fillArr}</ul>)
-    }
+    // for (let i = 0; i < iBoard.length; i++) {
+    //     let currentRow = iBoard[i]
+    //     const fillArr = [] // 3 li
+    //     for (let v = 0; v < currentRow.length; v++) {
+    //         const currentCell = currentRow[v]
+    //         fillArr.push(<li onClick={() => { handleClick(v, i) }} className={styles.li}>{(currentCell === '-') ? " " : currentCell}</li>)
+    //     }
+    //     renderBoard.push(<ul className={styles.ul}>{fillArr}</ul>)
+    // }
+
+    const renderBoard = iBoard.map((i, col) => {
+        let currentRow = i
+        const fillArr = currentRow.map((v, row) => (<li key={row} onClick={() => { handleClick(row, col) }} className={styles.li}>{(v === '-') ? " " : v}</li>))
+        return (<ul key={col} className={styles.ul}>{fillArr}</ul>)
+    })
 
     return (<>
         <div className={styles.container}>
@@ -122,6 +127,16 @@ export default function Game() {
         }
     }
 
-    return (<GameRender board={gameBoard} onClick={handleClick} message={message}/>)
-}
+    // const testArr = ["X", "X", "O", " ", "O", "O", "O", "O", "X"]
+    // const winLength = 4
+    
+    // function winCombination(e: string, i: number) {
+    //     for (let i = 0; i < winLength; i++) {
+    //         console.log(i)
+    //     }
+    // }
+    
+    // console.log(testArr.some(winCombination))
 
+    return (<GameRender board={gameBoard} onClick={handleClick} message={message} />)
+}
