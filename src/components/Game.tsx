@@ -90,7 +90,7 @@ export default function Game() {
     let [message, setMessage] = useState("")
 
     function turn(row: number, col: number) {
-        console.log(gameBoard)
+        // console.log(gameBoard)
         if (gameBoard[row][col] !== "-") {
             setMessage('Невозможно ходить там где нельзя!')
             return
@@ -117,7 +117,7 @@ export default function Game() {
 
 
     const handleClick = function (col: number, row: number) {
-        console.log(col + " " + row)
+        // console.log(col + " " + row)
         turn(row, col)
         setBoard([...gameBoard])
         if (curPlayer === "O") {
@@ -125,18 +125,32 @@ export default function Game() {
         } else {
             setCurPlayer("O")
         }
+
+        const testArr = ["X", "X", "O", " ", "X", "O", "O", "O", "X"]
+        const winLength = 4
+
+        function wincombo2(e: string, index: number, arr: string[]) {
+            return arr.slice(index, index + winLength).every(v => v === "O")
+        }
+
+        function wincomboCol2(e: string, index: number, board: string[][]) {
+            return board.map(row => row[index]).slice(index, index + winLength).every(v => v === "O")
+        }
+
+        function winCombination(e: string, index: number, arr: string[]) {
+            let sum = 0
+            for (let i = 0; i < winLength; i++) {
+                console.log(arr[index + i])
+                if (arr[index + i] === "O") {
+                    sum++
+                }
+            }
+            if (sum === winLength) {
+                return true
+            }
+            return false
+        }
+        console.log(testArr.some(wincombo2))
     }
-
-    // const testArr = ["X", "X", "O", " ", "O", "O", "O", "O", "X"]
-    // const winLength = 4
-    
-    // function winCombination(e: string, i: number) {
-    //     for (let i = 0; i < winLength; i++) {
-    //         console.log(i)
-    //     }
-    // }
-    
-    // console.log(testArr.some(winCombination))
-
     return (<GameRender board={gameBoard} onClick={handleClick} message={message} />)
 }
